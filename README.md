@@ -54,17 +54,33 @@ That's it! Your worktree is ready with all your configuration files and dependen
 
 ## Installation
 
-### Quick Install (Recommended)
+⚡ **30-Second Setup:**
 
+1. Install the tool:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yourusername/git-worktree-link-manager/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/luquanlang/git-worktree-create/main/install.sh | bash
 ```
 
-The installer will:
-1. Install `git-worktree-create` to `~/.local/bin`
-2. Offer to configure environment variables
-3. Test the installation
-4. Show you what to do next
+2. Add to your ~/.bashrc or ~/.zshrc:
+```bash
+export WORKTREE_CONTAINING_FOLDER="$HOME/worktrees"
+export WORKTREE_LINKED_FILES=".vscode,.env,node_modules"
+```
+
+3. Start using it! Either with an existing branch:
+```bash
+git worktree-create feature/my-branch
+```
+
+Or create a new branch from main:
+```bash
+git worktree-create -b feature/my-branch main
+```
+
+That's it! You're ready to go. Check out [Usage](#usage) to see what you can do.
+
+<details>
+<summary><strong>Alternative Installation Methods</strong> (click to expand)</summary>
 
 ### Manual Installation with Installer
 
@@ -110,10 +126,14 @@ ln -s "$(pwd)/git-worktree-create" ~/.local/bin/git-worktree-create
 
 # Now you can edit the script and changes take effect immediately
 ```
+</details>
 
 ## Configuration
 
-Add these environment variables to your shell configuration file (`~/.bashrc`, `~/.zshrc`, `~/.bash_profile`, etc.):
+The basic configuration is included in the quick setup above. For project-specific configurations, expand below:
+
+<details>
+<summary><strong>Project-Specific Configurations</strong> (click to expand)</summary>
 
 ```bash
 # Required: Base directory for all worktrees
@@ -153,14 +173,20 @@ export WORKTREE_LINKED_FILES=".vscode,.env,node_modules,vendor,venv"
 
 ## Usage
 
-### Basic Usage
-
 ```bash
-# Create a worktree for an existing branch
-git-worktree-create feature/user-login
+# Create a worktree (it's that simple!)
+git worktree-create feature/awesome-feature
 
-# Or use as a Git subcommand
-git worktree-create feature/user-login
+# Need a new branch? Use -b
+git worktree-create -b feature/new-feature main
+```
+
+That's all you need to know for daily use! Your worktree will be created at `~/worktrees/project-name-feature-awesome-feature` with all your configurations linked automatically.
+
+<details>
+<summary><strong>Advanced Usage and Options</strong> (click to expand)</summary>
+
+### Additional Commands
 ```
 
 ### Creating a New Branch with -b Flag
@@ -242,6 +268,11 @@ To start working in your new worktree:
 ```
 
 ## How It Works
+
+✨ In short: It creates a worktree and automatically links your shared files (configs, dependencies, etc.) to save space and keep everything in sync.
+
+<details>
+<summary><strong>Technical Details</strong> (click to expand)</summary>
 
 1. **Validates environment** - Checks you're in a Git repository and variables are set
 2. **Sanitizes branch name** - Converts `feature/login` to `feature-login` for the directory name
