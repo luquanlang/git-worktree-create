@@ -92,7 +92,14 @@ DESCRIPTION:
     worktree, similar to 'git worktree add -b'.
 
 CONFIGURATION:
-    Set these environment variables (typically in ~/.bashrc or ~/.zshrc):
+    Preferred: per-project configuration via a .env file in the repository root
+    (recommended). Create a `.env` with these lines:
+
+      WORKTREE_CONTAINING_FOLDER="$HOME/worktrees"
+      WORKTREE_LINKED_FILES=".vscode,.env,node_modules"
+
+    Alternatively, set these environment variables globally (e.g. in
+    ~/.bashrc or ~/.zshrc):
 
     WORKTREE_CONTAINING_FOLDER (required)
         Base directory where all worktrees will be created
@@ -127,13 +134,66 @@ NOTES:
     - Existing files/directories are never overwritten
     - Missing source files are skipped with a warning
 
-For more information, visit: https://github.com/yourusername/git-worktree-link-manager
+For more information, visit: https://github.com/luquanlang/git-worktree-create
 EOF
 }
 
 # Version message
 show_version() {
     echo "git-worktree-create version $VERSION"
+}
+
+# Load project-local .env (if present). Looks for .env (or .worktree.env) in the
+# repository root (preferred) or current working directory. Lines beginning with
+# '#' and blank lines are ignored. Simple KEY=VALUE pairs are exported into the
+# environment for the duration of the command.
+load_project_env() {
+    local repo_root
+    repo_root=$(git rev-parse --show-toplevel 2>/dev/null || true)
+    if [[ -z "$repo_root" ]]; then
+        repo_root="$(pwd)"
+    fi
+
+    local candidates=("$repo_root/.env" "$repo_root/.worktree.env")
+    local found=false
+
+    for f in "${candidates[@]}"; do
+        if [[ -f "$f" ]]; then
+            info "Loading project env: $f"
+            # Read file line by line, ignore comments and blanks
+            while IFS= read -r line || [[ -n "$line" ]]; do
+                # Trim leading/trailing whitespace
+                line="$(echo "$line" | sed -e 's/^\s*//' -e 's/\s*$//')"
+                # Skip comments and empty
+                if [[ -z "$line" || "$line" =~ ^# ]]; then
+                    continue
+                fi
+                # Only handle simple KEY=VALUE lines
+                if [[ "$line" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
+                    local key="${BASH_REMATCH[1]}"
+                    local val="${BASH_REMATCH[2]}"
+                    # Remove surrounding quotes if present
+                    if [[ "$val" =~ ^\".*\"$ || "$val" =~ ^\'.*\'$ ]]; then
+                        val="${val:1:${#val}-2}"
+                    fi
+                    # Do not override already-exported environment variables;
+                    # project .env provides defaults but respects existing env.
+                    if [[ -z "${!key:-}" ]]; then
+                        export "$key=$val"
+                        verbose "Loaded $key from $f"
+                    else
+                        verbose "Skipped $key from $f; already set in environment"
+                    fi
+                fi
+            done < "$f"
+            found=true
+            break
+        fi
+    done
+
+    if [[ "$found" == false ]]; then
+        verbose "No project-local env file found at $repo_root"
+    fi
 }
 
 # Validate environment
@@ -155,7 +215,10 @@ validate_environment() {
         echo "Please set it to your desired worktrees base directory:"
         echo "  export WORKTREE_CONTAINING_FOLDER=\"\$HOME/worktrees\""
         echo ""
-        echo "Add this to your shell configuration file (~/.bashrc, ~/.zshrc, etc.)"
+        echo "Prefer per-project configuration: create a .env file in your repo root with:" 
+        echo "  WORKTREE_CONTAINING_FOLDER=\"\$HOME/worktrees\""
+        echo "  WORKTREE_LINKED_FILES=\".vscode,.env,node_modules\""
+        echo "Alternatively, add it to your shell configuration file (~/.bashrc, ~/.zshrc, etc.)"
         exit 1
     fi
     verbose "✓ WORKTREE_CONTAINING_FOLDER is set: $WORKTREE_CONTAINING_FOLDER"
@@ -412,7 +475,8 @@ main() {
         exit 1
     fi
 
-    # Validate environment
+    # Load project-local .env if present, then validate environment
+    load_project_env
     validate_environment
 
     # Create worktree
