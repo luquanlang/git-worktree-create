@@ -473,10 +473,20 @@ main() {
     # Install the script
     local script_path
     if [[ "$install_mode" == "system" ]] && [[ ! -w "$install_dir" ]]; then
+        # Download to temp file first for system installation
+        info "Downloading script for system installation..."
+        local temp_file
+        temp_file=$(download_script)
+        
+        if [[ $? -ne 0 ]]; then
+            error "Failed to download script"
+            exit 1
+        fi
+        
         # Need sudo for system installation
         sudo bash -c "
             mkdir -p '$install_dir'
-            cp '$(dirname "${BASH_SOURCE[0]}")/$SCRIPT_NAME' '$install_dir/$SCRIPT_NAME'
+            mv '$temp_file' '$install_dir/$SCRIPT_NAME'
             chmod +x '$install_dir/$SCRIPT_NAME'
         "
         script_path="$install_dir/$SCRIPT_NAME"
