@@ -34,6 +34,18 @@ That's it! Your worktree is ready with all your configuration files and dependen
 - **Environment-based** - Configure once, use everywhere
 - **Git native** - Works as `git worktree-create` (Git custom command)
 
+## Table of Contents
+- [Git Worktree Link Manager](#git-worktree-link-manager)
+  - [The Problem](#the-problem)
+  - [The Solution](#the-solution)
+  - [Features](#features)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Examples](#examples)
+  - [Contributing](#contributing)
+  - [License](#license)
+
 ## Requirements
 
 - **Bash** 4.0 or later
