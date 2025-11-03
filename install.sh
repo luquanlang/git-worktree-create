@@ -187,11 +187,21 @@ install_script() {
     fi
 
     local source_script=""
-    # Check if we're running from a file
-    if [[ -n "${BASH_SOURCE[0]:-}" ]] && [[ "${BASH_SOURCE[0]}" != "/dev/stdin" ]]; then
+    # Determine script directory safely. Avoid direct unguarded expansion of
+    # BASH_SOURCE to prevent "unbound variable" when the installer is piped to
+    # bash (no source file available).
+    local bs0="${BASH_SOURCE[0]:-}"
+    if [[ -n "$bs0" && "$bs0" != "/dev/stdin" && -f "$bs0" ]]; then
         local script_dir
-        script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        script_dir="$(cd "$(dirname "$bs0")" && pwd)"
         source_script="$script_dir/$SCRIPT_NAME"
+    else
+        # Fallback: if $0 points to a file (script was executed from file), use it
+        if [[ -n "${0:-}" && -f "${0:-}" ]]; then
+            local script_dir
+            script_dir="$(cd "$(dirname "${0}")" && pwd)"
+            source_script="$script_dir/$SCRIPT_NAME"
+        fi
     fi
 
     # Try local file first, then download if not found
