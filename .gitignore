@@ -1,0 +1,54 @@
+# Git Worktree Link Manager - .gitignore
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Editor and IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+*.cache
+
+# Test directories
+test-repo/
+test-worktrees/
+/tmp/
+
+# Local configuration (if users create project-specific configs)
+.worktree-config
+.env.local
+
+# Development
+*.test
+test_*.sh
+
+# Documentation build artifacts (if we add doc generation later)
+docs/_build/
+site/
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
