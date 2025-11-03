@@ -235,8 +235,16 @@ configure_environment() {
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
+    # If stdin is not a TTY (e.g. installer piped via curl | bash), skip
+    # interactive configuration to avoid read failing under set -e.
+    if [[ ! -t 0 ]]; then
+        info "Non-interactive shell detected; skipping environment configuration."
+        show_manual_setup_instructions
+        return
+    fi
+
     echo "Would you like to configure environment variables now? [Y/n]"
-    read -r response
+    read -r response || response=""
 
     if [[ "$response" =~ ^[Nn] ]]; then
         echo ""
