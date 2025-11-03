@@ -13,7 +13,7 @@
 set -euo pipefail
 
 # Script version
-VERSION="1.0.3"
+VERSION="1.0.4"
 
 # Color codes for output
 if [[ -t 1 ]]; then
@@ -63,6 +63,40 @@ dry_run_msg() {
     if [[ "$DRY_RUN" == true ]]; then
         echo -e "${YELLOW}[DRY RUN]${NC} $*" >&2
     fi
+}
+
+# Expand path: handles tilde, environment variables, and relative paths
+expand_path() {
+    local path="$1"
+
+    # First, expand tilde and environment variables using eval
+    # This handles: ~/foo, $HOME/foo, ${VAR}/foo
+    path=$(eval echo "$path")
+
+    # Then resolve to absolute path using realpath
+    # realpath resolves symlinks and converts relative paths to absolute
+    if command -v realpath &> /dev/null; then
+        # Try with -m flag (doesn't require path to exist - GNU coreutils)
+        if realpath -m "$path" &> /dev/null 2>&1; then
+            path=$(realpath -m "$path")
+        # Fallback: if path exists, resolve it
+        elif [[ -e "$path" ]]; then
+            path=$(realpath "$path")
+        # Fallback: if parent exists, resolve parent and append basename
+        elif [[ -e "$(dirname "$path")" ]]; then
+            path="$(realpath "$(dirname "$path")")/$(basename "$path")"
+        fi
+        # If neither exists, keep the eval-expanded version
+    else
+        # If realpath is not available, try using cd (for existing directories)
+        if [[ -d "$path" ]]; then
+            path=$(cd "$path" && pwd)
+        elif [[ -e "$(dirname "$path")" ]]; then
+            path="$(cd "$(dirname "$path")" && pwd)/$(basename "$path")"
+        fi
+    fi
+
+    echo "$path"
 }
 
 # Help message
@@ -222,6 +256,10 @@ validate_environment() {
         exit 1
     fi
     verbose "✓ WORKTREE_CONTAINING_FOLDER is set: $WORKTREE_CONTAINING_FOLDER"
+
+    # Expand path (tilde, environment variables, relative paths)
+    WORKTREE_CONTAINING_FOLDER=$(expand_path "$WORKTREE_CONTAINING_FOLDER")
+    verbose "✓ WORKTREE_CONTAINING_FOLDER expanded to: $WORKTREE_CONTAINING_FOLDER"
 
     # WORKTREE_LINKED_FILES is optional, but show what's configured
     if [[ -z "${WORKTREE_LINKED_FILES:-}" ]]; then
