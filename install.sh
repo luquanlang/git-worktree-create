@@ -328,8 +328,26 @@ show_manual_setup_instructions() {
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
-    echo "${BOLD}Manual Configuration:${NC}"
+    # Prefer project-local configuration in a .env file inside the repo root
+    # (recommended) so settings are shared with that project rather than
+    # injected into the user's global shell profile.
+    echo -e "${BOLD}Manual Configuration:${NC}"
     echo ""
+    echo "Recommended: per-project .env (preferred)"
+    echo "---------------------------------------"
+    echo "Create a file named .env in the root of your repository and add:" 
+    echo ""
+    echo "  # Git Worktree Link Manager (project-local)" 
+    echo "  WORKTREE_CONTAINING_FOLDER=\"\$HOME/worktrees\"" 
+    echo "  WORKTREE_LINKED_FILES=\".vscode,.env,node_modules\"" 
+    echo ""
+    echo "This keeps configuration specific to the project and portable to other
+developers/CI where the repository is cloned. Your application runtime may
+also load .env files (this is fine) — this file is simply used by the
+installer/tool when creating worktrees for this repository."
+    echo ""
+    echo "Alternative: global shell configuration (less preferred)"
+    echo "---------------------------------------"
     echo "Add these lines to your shell configuration file ($shell_config):"
     echo ""
     echo "  # Git Worktree Link Manager configuration"

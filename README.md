@@ -61,11 +61,14 @@ That's it! Your worktree is ready with all your configuration files and dependen
 curl -fsSL https://raw.githubusercontent.com/luquanlang/git-worktree-create/main/install.sh | bash
 ```
 
-2. Add to your ~/.bashrc or ~/.zshrc:
-```bash
-export WORKTREE_CONTAINING_FOLDER="$HOME/worktrees"
-export WORKTREE_LINKED_FILES=".vscode,.env,node_modules"
+2. Recommended: create a `.env` file in the root of each repository (preferred):
+```env
+# Git Worktree Link Manager (project-local)
+WORKTREE_CONTAINING_FOLDER="$HOME/worktrees"
+WORKTREE_LINKED_FILES=".vscode,.env,node_modules"
 ```
+
+For a global (per-user) setup instead, see the "Configuration" section below.
 
 3. Start using it! Either with an existing branch:
 ```bash
@@ -148,6 +151,21 @@ Then reload your configuration:
 ```bash
 source ~/.bashrc  # or ~/.zshrc, etc.
 ```
+
+### Recommended: per-project configuration (preferred)
+
+It's often better to keep worktree configuration inside each project's repository so it's portable and explicit.
+
+Create a `.env` file at the root of your repository with these lines:
+
+```env
+# Git Worktree Link Manager (project-local)
+WORKTREE_CONTAINING_FOLDER="$HOME/worktrees"
+WORKTREE_LINKED_FILES=".vscode,.env,node_modules"
+```
+
+Many projects already load `.env` files for development — this keeps the worktree settings alongside the repo and avoids modifying users' global shell profiles.
+
 
 ### Configuration by Project Type
 
