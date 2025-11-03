@@ -16,6 +16,7 @@ set -euo pipefail
 
 VERSION="1.0.0"
 SCRIPT_NAME="git-worktree-create"
+SCRIPT_URL="https://raw.githubusercontent.com/luquanlang/git-worktree-create/main/git-worktree-create"
 
 # Color codes
 if [[ -t 1 ]]; then
@@ -94,6 +95,17 @@ check_dependencies() {
         success "Git version $git_version detected"
     fi
 
+    # Check for curl or wget
+    if ! command -v curl &> /dev/null && ! command -v wget &> /dev/null; then
+        missing_deps+=("curl/wget")
+    else
+        if command -v curl &> /dev/null; then
+            success "curl detected for downloads"
+        elif command -v wget &> /dev/null; then
+            success "wget detected for downloads"
+        fi
+    fi
+
     # Report missing dependencies
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
         error "Missing required dependencies: ${missing_deps[*]}"
@@ -139,6 +151,30 @@ is_in_path() {
     esac
 }
 
+# Download the script from remote URL
+download_script() {
+    local temp_file
+    temp_file=$(mktemp)
+    
+    if command -v curl &> /dev/null; then
+        if ! curl -fsSL "$SCRIPT_URL" -o "$temp_file"; then
+            rm -f "$temp_file"
+            return 1
+        fi
+    elif command -v wget &> /dev/null; then
+        if ! wget -q "$SCRIPT_URL" -O "$temp_file"; then
+            rm -f "$temp_file"
+            return 1
+        fi
+    else
+        error "Neither curl nor wget found. Cannot download script."
+        rm -f "$temp_file"
+        return 1
+    fi
+    
+    echo "$temp_file"
+}
+
 # Install the script
 install_script() {
     local install_dir="$1"
@@ -149,22 +185,28 @@ install_script() {
     script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local source_script="$script_dir/$SCRIPT_NAME"
 
-    # Check if source script exists
-    if [[ ! -f "$source_script" ]]; then
-        error "Cannot find $SCRIPT_NAME in $script_dir"
-        error "Please run this installer from the git-worktree-link-manager directory"
-        exit 1
-    fi
-
     # Create install directory if it doesn't exist
     if [[ ! -d "$install_dir" ]]; then
         info "Creating directory: $install_dir"
         mkdir -p "$install_dir"
     fi
 
-    # Copy the script
-    info "Installing $SCRIPT_NAME to $install_dir..."
-    cp "$source_script" "$script_path"
+    # Try local file first, then download if not found
+    if [[ -f "$source_script" ]]; then
+        info "Installing from local file..."
+        cp "$source_script" "$script_path"
+    else
+        info "Local file not found, downloading from remote..."
+        local temp_file
+        temp_file=$(download_script)
+        
+        if [[ $? -ne 0 ]]; then
+            error "Failed to download script"
+            exit 1
+        fi
+        
+        mv "$temp_file" "$script_path"
+    fi
     chmod +x "$script_path"
     success "Installed to: $script_path"
     success "Made executable"
