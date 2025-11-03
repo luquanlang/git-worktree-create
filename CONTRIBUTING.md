@@ -112,8 +112,8 @@ Any other relevant information
 1. **Fork the repository**
    ```bash
    # Fork on GitHub, then clone your fork
-   git clone https://github.com/YOUR-USERNAME/git-worktree-link-manager.git
-   cd git-worktree-link-manager
+   git clone https://github.com/luquanlang/git-worktree-create.git
+   cd git-worktree-create
    ```
 
 2. **Create a development link**

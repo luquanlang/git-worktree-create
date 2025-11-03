@@ -532,6 +532,21 @@ main() {
         script_path=$(install_script "$install_dir")
     fi
 
+    # Detect project root and check for a project-local .env file.
+    # If we're inside a Git repository, prefer the repo root; otherwise use PWD.
+    local repo_root
+    repo_root=$(git rev-parse --show-toplevel 2>/dev/null || true)
+    if [[ -z "$repo_root" ]]; then
+        repo_root="$(pwd)"
+    fi
+    local project_env="$repo_root/.env"
+    if [[ -f "$project_env" ]]; then
+        success "Detected project .env: $project_env"
+    else
+        info "No project .env found at: $repo_root"
+        info "To use per-project configuration, create: $project_env"
+    fi
+
     # Check if install directory is in PATH
     if ! is_in_path "$install_dir"; then
         echo ""
@@ -553,9 +568,9 @@ main() {
     echo "Next steps:"
     echo "  1. Restart your terminal or run: source $(detect_shell_config)"
     echo "  2. Navigate to a Git repository"
-    echo "  3. Run: git worktree-create feature/my-branch"
+    echo "  3. Run: git-worktree-create feature/my-branch"
     echo ""
-    echo "Documentation: https://github.com/yourusername/git-worktree-link-manager"
+    echo "Documentation: https://github.com/luquanlang/git-worktree-create"
     echo ""
 }
 

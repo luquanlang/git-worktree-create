@@ -19,7 +19,7 @@ When working with Git worktrees to manage multiple branches simultaneously, deve
 **One command** that creates a worktree **and** automatically links your shared files:
 
 ```bash
-git worktree-create feature/user-auth
+git-worktree-create feature/user-auth
 ```
 
 That's it! Your worktree is ready with all your configuration files and dependencies linked.
@@ -32,7 +32,7 @@ That's it! Your worktree is ready with all your configuration files and dependen
 - **Dry-run mode** - Preview what will be created before making changes
 - **Verbose output** - See exactly what's happening at each step
 - **Environment-based** - Configure once, use everywhere
-- **Git native** - Works as `git worktree-create` (Git custom command)
+- **Git native** - Works as `git-worktree-create` (Git custom command)
 
 ## Table of Contents
 - [Git Worktree Link Manager](#git-worktree-link-manager)
@@ -72,12 +72,12 @@ For a global (per-user) setup instead, see the "Configuration" section below.
 
 3. Start using it! Either with an existing branch:
 ```bash
-git worktree-create feature/my-branch
+git-worktree-create feature/my-branch
 ```
 
 Or create a new branch from main:
 ```bash
-git worktree-create -b feature/my-branch main
+git-worktree-create -b feature/my-branch main
 ```
 
 That's it! You're ready to go. Check out [Usage](#usage) to see what you can do.
@@ -89,8 +89,8 @@ That's it! You're ready to go. Check out [Usage](#usage) to see what you can do.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/git-worktree-link-manager.git
-cd git-worktree-link-manager
+git clone https://github.com/luquanlang/git-worktree-create.git
+cd git-worktree-create
 
 # Run the installer
 ./install.sh
@@ -106,8 +106,8 @@ cd git-worktree-link-manager
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/git-worktree-link-manager.git
-cd git-worktree-link-manager
+git clone https://github.com/luquanlang/git-worktree-create.git
+cd git-worktree-create
 
 # Copy to a directory in your PATH
 cp git-worktree-create ~/.local/bin/
@@ -121,8 +121,8 @@ git-worktree-create --version
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/git-worktree-link-manager.git
-cd git-worktree-link-manager
+git clone https://github.com/luquanlang/git-worktree-create.git
+cd git-worktree-create
 
 # Create a symlink in your PATH
 ln -s "$(pwd)/git-worktree-create" ~/.local/bin/git-worktree-create
@@ -193,10 +193,10 @@ export WORKTREE_LINKED_FILES=".vscode,.env,node_modules,vendor,venv"
 
 ```bash
 # Create a worktree (it's that simple!)
-git worktree-create feature/awesome-feature
+git-worktree-create feature/awesome-feature
 
 # Need a new branch? Use -b
-git worktree-create -b feature/new-feature main
+git-worktree-create -b feature/new-feature main
 ```
 
 That's all you need to know for daily use! Your worktree will be created at `~/worktrees/project-name-feature-awesome-feature` with all your configurations linked automatically.
@@ -222,7 +222,7 @@ git-worktree-create -b hotfix/critical-bug origin/production
 git-worktree-create -b experiment/idea HEAD~5
 
 # Create from develop branch
-git worktree-create -b feature/user-dashboard develop
+git-worktree-create -b feature/user-dashboard develop
 ```
 
 ### Options
@@ -450,8 +450,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/git-worktree-link-manager/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/git-worktree-link-manager/discussions)
+- **Issues**: [GitHub Issues](https://github.com/luquanlang/git-worktree-create/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/luquanlang/git-worktree-create/discussions)
 - **Documentation**: This README and [EXAMPLES.md](EXAMPLES.md)
 
 ---
