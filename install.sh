@@ -180,19 +180,22 @@ install_script() {
     local install_dir="$1"
     local script_path="$install_dir/$SCRIPT_NAME"
 
-    # Get script directory
-    local script_dir
-    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local source_script="$script_dir/$SCRIPT_NAME"
-
     # Create install directory if it doesn't exist
     if [[ ! -d "$install_dir" ]]; then
         info "Creating directory: $install_dir"
         mkdir -p "$install_dir"
     fi
 
+    local source_script=""
+    # Check if we're running from a file
+    if [[ -n "${BASH_SOURCE[0]:-}" ]] && [[ "${BASH_SOURCE[0]}" != "/dev/stdin" ]]; then
+        local script_dir
+        script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        source_script="$script_dir/$SCRIPT_NAME"
+    fi
+
     # Try local file first, then download if not found
-    if [[ -f "$source_script" ]]; then
+    if [[ -n "$source_script" ]] && [[ -f "$source_script" ]]; then
         info "Installing from local file..."
         cp "$source_script" "$script_path"
     else
